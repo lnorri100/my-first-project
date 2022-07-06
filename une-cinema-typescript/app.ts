@@ -9,13 +9,27 @@ class Seat {
     status: STATUS
     element: HTMLDivElement
 
-    constructor(id: number, isOccupied: boolean = false){
+    constructor(id: number, isOccupied: boolean = false) {
         this.id = id
-        this.status = isOccupied ? STATUS.OCCUPIED: STATUS.AVAILABLE
+        this.status = isOccupied ? STATUS.OCCUPIED : STATUS.AVAILABLE
         this.element = document.createElement('div')
         this.element.classList.add('seat')
         this.element.classList.add(this.status.toLowerCase())
+        this.element.addEventListener('click', () => {
+        this.handleClick()
+        })
     }
+
+  handleClick() {
+    if (this.status === STATUS.OCCUPIED) return
+    this.element.classList.remove(this.status.toLowerCase())
+    this.status =
+      this.status === STATUS.AVAILABLE ? STATUS.SELECTED : STATUS.AVAILABLE
+    this.element.classList.add(this.status.toLowerCase())
+  }
+  get isSelected(){
+    return this.status === STATUS.SELECTED
+  }
 }
 
 class Row{
@@ -33,6 +47,10 @@ class Row{
         this.element.classList.add('row')
         this.element.append(...this.seats.map((seat) => seat.element))
     }
+
+    get SelectedSeatId(){
+        return this.seats.filter((seat) => seat.isSelected).map((seat) => seat.id)
+    }
 }
 
 class SeatMap{
@@ -47,6 +65,18 @@ class SeatMap{
         this.element = document.createElement('div')
         this.element.classList.add('seat-map')
         this.element.append(...this.rows.map((row) => row.element))
+        this.element.addEventListener('click', () => {
+            this.getSelectedSeatId()
+        })
+    }
+
+    getSelectedSeatId(){
+        // this.selectedSeats = this.rows.reduce<number[]>((total, row) => {
+        //     total = [...total, ...row.SelectedSeatId]
+        //     return total
+        // }, [])
+        this.selectedSeats = this.rows.map(row => row.SelectedSeatId).flat()
+        console.log(`selected seats: ${this.selectedSeats.join(',')}`)
     }
 }
 
